@@ -1,21 +1,28 @@
+using kontorExpert.BusinessLogic;
 using kontorExpert.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Threading.Tasks;
 
 namespace kontorExpert.Controllers
 {
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
+        private readonly CategoryLogic _categoryLogic;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(ILogger<HomeController> logger, CategoryLogic categoryLogic)
         {
             _logger = logger;
+            _categoryLogic = categoryLogic;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            return View();
+            List<Category> categories = await _categoryLogic.GetAllCategoriesAsync();
+            return View(categories);
         }
 
         public IActionResult Privacy()
