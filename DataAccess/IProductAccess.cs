@@ -1,14 +1,15 @@
-﻿using kontorExpert.Models;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+using kontorExpert.Models;
 
 namespace kontorExpert.DataAccess
 {
     public interface IProductAccess
     {
-        int AddProduct(Product product);
-        Product GetProductById(int productId);
-        void UpdateProduct(Product product);
-        void DeleteProduct(int productId);
-        List<Product> GetAllProducts();
+        Task<int> AddProductAsync(Product product);
+        Task<Product> GetProductByIdAsync(int productId);
+        Task UpdateProductAsync(Product product);
+        Task DeleteProductAsync(int productId);
+        Task<List<Product>> GetAllProductsAsync();
     }
-
 }

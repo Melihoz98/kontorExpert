@@ -1,11 +1,12 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using kontorExpert.Models;
 
 public interface ICategoryAccess
 {
-    void AddCategory(Category category);
-    Category GetCategoryByID(int categoryId);
-    void UpdateCategory(Category category);
-    void DeleteCategory(int categoryId);
-    List<Category> GetAllCategories();
+    Task AddCategoryAsync(Category category);
+    Task<Category> GetCategoryByIDAsync(int categoryId);
+    Task UpdateCategoryAsync(Category category);
+    Task DeleteCategoryAsync(int categoryId);
+    Task<List<Category>> GetAllCategoriesAsync();
 }

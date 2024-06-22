@@ -1,8 +1,9 @@
-﻿using Microsoft.Extensions.Configuration;
-using kontorExpert.Models;
+﻿using kontorExpert.Models;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using Microsoft.Data.SqlClient;
+using System.Threading.Tasks;
 
 namespace kontorExpert.DataAccess
 {
@@ -19,7 +20,7 @@ namespace kontorExpert.DataAccess
             }
         }
 
-        public int AddProduct(Product product)
+        public async Task<int> AddProductAsync(Product product)
         {
             try
             {
@@ -39,8 +40,8 @@ namespace kontorExpert.DataAccess
                     createCommand.Parameters.AddWithValue("@CategoryID", product.CategoryID);
                     createCommand.Parameters.AddWithValue("@IsUsed", product.IsUsed);
 
-                    con.Open();
-                    int productId = Convert.ToInt32(createCommand.ExecuteScalar());
+                    await con.OpenAsync();
+                    int productId = Convert.ToInt32(await createCommand.ExecuteScalarAsync());
                     return productId;
                 }
             }
@@ -51,7 +52,7 @@ namespace kontorExpert.DataAccess
             }
         }
 
-        public Product GetProductById(int productId)
+        public async Task<Product> GetProductByIdAsync(int productId)
         {
             Product foundProduct = null;
 
@@ -64,11 +65,10 @@ namespace kontorExpert.DataAccess
                 {
                     readCommand.Parameters.AddWithValue("@ProductID", productId);
 
-                    con.Open();
+                    await con.OpenAsync();
+                    SqlDataReader productReader = await readCommand.ExecuteReaderAsync();
 
-                    SqlDataReader productReader = readCommand.ExecuteReader();
-
-                    if (productReader.Read())
+                    if (await productReader.ReadAsync())
                     {
                         foundProduct = GetProductFromReader(productReader);
                     }
@@ -83,7 +83,7 @@ namespace kontorExpert.DataAccess
             return foundProduct;
         }
 
-        public void UpdateProduct(Product product)
+        public async Task UpdateProductAsync(Product product)
         {
             try
             {
@@ -104,8 +104,8 @@ namespace kontorExpert.DataAccess
                     updateCommand.Parameters.AddWithValue("@IsUsed", product.IsUsed);
                     updateCommand.Parameters.AddWithValue("@ProductID", product.ProductID);
 
-                    con.Open();
-                    updateCommand.ExecuteNonQuery();
+                    await con.OpenAsync();
+                    await updateCommand.ExecuteNonQueryAsync();
                 }
             }
             catch (Exception ex)
@@ -115,7 +115,7 @@ namespace kontorExpert.DataAccess
             }
         }
 
-        public void DeleteProduct(int productId)
+        public async Task DeleteProductAsync(int productId)
         {
             try
             {
@@ -126,8 +126,8 @@ namespace kontorExpert.DataAccess
                 {
                     deleteCommand.Parameters.AddWithValue("@ProductID", productId);
 
-                    con.Open();
-                    deleteCommand.ExecuteNonQuery();
+                    await con.OpenAsync();
+                    await deleteCommand.ExecuteNonQueryAsync();
                 }
             }
             catch (Exception ex)
@@ -137,7 +137,7 @@ namespace kontorExpert.DataAccess
             }
         }
 
-        public List<Product> GetAllProducts()
+        public async Task<List<Product>> GetAllProductsAsync()
         {
             List<Product> foundProducts = new List<Product>();
 
@@ -148,11 +148,10 @@ namespace kontorExpert.DataAccess
                 using (SqlConnection con = new SqlConnection(_connectionString))
                 using (SqlCommand readCommand = new SqlCommand(queryString, con))
                 {
-                    con.Open();
+                    await con.OpenAsync();
+                    SqlDataReader productReader = await readCommand.ExecuteReaderAsync();
 
-                    SqlDataReader productReader = readCommand.ExecuteReader();
-
-                    while (productReader.Read())
+                    while (await productReader.ReadAsync())
                     {
                         Product product = GetProductFromReader(productReader);
                         foundProducts.Add(product);

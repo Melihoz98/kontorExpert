@@ -3,6 +3,7 @@ using kontorExpert.Models;
 using System;
 using System.Collections.Generic;
 using Microsoft.Data.SqlClient;
+using System.Threading.Tasks;
 
 namespace kontorExpert.DataAccess
 {
@@ -19,7 +20,7 @@ namespace kontorExpert.DataAccess
             }
         }
 
-        public int AddProductImage(ProductImage productImage)
+        public async Task<int> AddProductImageAsync(ProductImage productImage)
         {
             try
             {
@@ -33,8 +34,8 @@ namespace kontorExpert.DataAccess
                     createCommand.Parameters.AddWithValue("@ProductID", productImage.ProductID);
                     createCommand.Parameters.AddWithValue("@ImageUrl", productImage.ImageUrl);
 
-                    con.Open();
-                    int imageId = Convert.ToInt32(createCommand.ExecuteScalar());
+                    await con.OpenAsync();
+                    int imageId = Convert.ToInt32(await createCommand.ExecuteScalarAsync());
                     return imageId;
                 }
             }
@@ -45,7 +46,7 @@ namespace kontorExpert.DataAccess
             }
         }
 
-        public ProductImage GetProductImageById(int imageId)
+        public async Task<ProductImage> GetProductImageByIdAsync(int imageId)
         {
             ProductImage foundImage = null;
 
@@ -58,11 +59,11 @@ namespace kontorExpert.DataAccess
                 {
                     readCommand.Parameters.AddWithValue("@ImageID", imageId);
 
-                    con.Open();
+                    await con.OpenAsync();
 
-                    SqlDataReader imageReader = readCommand.ExecuteReader();
+                    SqlDataReader imageReader = await readCommand.ExecuteReaderAsync();
 
-                    if (imageReader.Read())
+                    if (await imageReader.ReadAsync())
                     {
                         foundImage = GetProductImageFromReader(imageReader);
                     }
@@ -77,7 +78,7 @@ namespace kontorExpert.DataAccess
             return foundImage;
         }
 
-        public void UpdateProductImage(ProductImage productImage)
+        public async Task UpdateProductImageAsync(ProductImage productImage)
         {
             try
             {
@@ -90,8 +91,8 @@ namespace kontorExpert.DataAccess
                     updateCommand.Parameters.AddWithValue("@ImageUrl", productImage.ImageUrl);
                     updateCommand.Parameters.AddWithValue("@ImageID", productImage.ImageID);
 
-                    con.Open();
-                    updateCommand.ExecuteNonQuery();
+                    await con.OpenAsync();
+                    await updateCommand.ExecuteNonQueryAsync();
                 }
             }
             catch (Exception ex)
@@ -101,7 +102,7 @@ namespace kontorExpert.DataAccess
             }
         }
 
-        public void DeleteProductImage(int imageId)
+        public async Task DeleteProductImageAsync(int imageId)
         {
             try
             {
@@ -112,8 +113,8 @@ namespace kontorExpert.DataAccess
                 {
                     deleteCommand.Parameters.AddWithValue("@ImageID", imageId);
 
-                    con.Open();
-                    deleteCommand.ExecuteNonQuery();
+                    await con.OpenAsync();
+                    await deleteCommand.ExecuteNonQueryAsync();
                 }
             }
             catch (Exception ex)
@@ -123,7 +124,7 @@ namespace kontorExpert.DataAccess
             }
         }
 
-        public List<ProductImage> GetProductImagesByProductId(int productId)
+        public async Task<List<ProductImage>> GetProductImagesByProductIdAsync(int productId)
         {
             List<ProductImage> foundImages = new List<ProductImage>();
 
@@ -136,11 +137,11 @@ namespace kontorExpert.DataAccess
                 {
                     readCommand.Parameters.AddWithValue("@ProductID", productId);
 
-                    con.Open();
+                    await con.OpenAsync();
 
-                    SqlDataReader imageReader = readCommand.ExecuteReader();
+                    SqlDataReader imageReader = await readCommand.ExecuteReaderAsync();
 
-                    while (imageReader.Read())
+                    while (await imageReader.ReadAsync())
                     {
                         ProductImage image = GetProductImageFromReader(imageReader);
                         foundImages.Add(image);

@@ -3,6 +3,7 @@ using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using Microsoft.Data.SqlClient;
+using System.Threading.Tasks;
 
 namespace kontorExpert.DataAccess
 {
@@ -19,7 +20,7 @@ namespace kontorExpert.DataAccess
             }
         }
 
-        public void AddCategory(Category category)
+        public async Task AddCategoryAsync(Category category)
         {
             try
             {
@@ -31,8 +32,8 @@ namespace kontorExpert.DataAccess
                     createCommand.Parameters.AddWithValue("@CategoryId", category.CategoryID);
                     createCommand.Parameters.AddWithValue("@CategoryName", category.CategoryName);
 
-                    con.Open();
-                    createCommand.ExecuteNonQuery();
+                    await con.OpenAsync();
+                    await createCommand.ExecuteNonQueryAsync();
                 }
             }
             catch (Exception ex)
@@ -42,7 +43,7 @@ namespace kontorExpert.DataAccess
             }
         }
 
-        public Category GetCategoryByID(int categoryId)
+        public async Task<Category> GetCategoryByIDAsync(int categoryId)
         {
             Category foundCategory = null;
 
@@ -55,11 +56,10 @@ namespace kontorExpert.DataAccess
                 {
                     readCommand.Parameters.AddWithValue("@CategoryID", categoryId);
 
-                    con.Open();
+                    await con.OpenAsync();
+                    SqlDataReader categoryReader = await readCommand.ExecuteReaderAsync();
 
-                    SqlDataReader categoryReader = readCommand.ExecuteReader();
-
-                    if (categoryReader.Read())
+                    if (await categoryReader.ReadAsync())
                     {
                         foundCategory = GetCategoryFromReader(categoryReader);
                     }
@@ -74,7 +74,7 @@ namespace kontorExpert.DataAccess
             return foundCategory;
         }
 
-        public void UpdateCategory(Category category)
+        public async Task UpdateCategoryAsync(Category category)
         {
             try
             {
@@ -86,8 +86,8 @@ namespace kontorExpert.DataAccess
                     updateCommand.Parameters.AddWithValue("@CategoryName", category.CategoryName);
                     updateCommand.Parameters.AddWithValue("@CategoryID", category.CategoryID);
 
-                    con.Open();
-                    updateCommand.ExecuteNonQuery();
+                    await con.OpenAsync();
+                    await updateCommand.ExecuteNonQueryAsync();
                 }
             }
             catch (Exception ex)
@@ -97,7 +97,7 @@ namespace kontorExpert.DataAccess
             }
         }
 
-        public void DeleteCategory(int categoryId)
+        public async Task DeleteCategoryAsync(int categoryId)
         {
             try
             {
@@ -108,8 +108,8 @@ namespace kontorExpert.DataAccess
                 {
                     deleteCommand.Parameters.AddWithValue("@CategoryID", categoryId);
 
-                    con.Open();
-                    deleteCommand.ExecuteNonQuery();
+                    await con.OpenAsync();
+                    await deleteCommand.ExecuteNonQueryAsync();
                 }
             }
             catch (Exception ex)
@@ -119,7 +119,7 @@ namespace kontorExpert.DataAccess
             }
         }
 
-        public List<Category> GetAllCategories()
+        public async Task<List<Category>> GetAllCategoriesAsync()
         {
             List<Category> foundCategories = new List<Category>();
 
@@ -130,11 +130,10 @@ namespace kontorExpert.DataAccess
                 using (SqlConnection con = new SqlConnection(_connectionString))
                 using (SqlCommand readCommand = new SqlCommand(queryString, con))
                 {
-                    con.Open();
+                    await con.OpenAsync();
+                    SqlDataReader categoryReader = await readCommand.ExecuteReaderAsync();
 
-                    SqlDataReader categoryReader = readCommand.ExecuteReader();
-
-                    while (categoryReader.Read())
+                    while (await categoryReader.ReadAsync())
                     {
                         Category category = GetCategoryFromReader(categoryReader);
                         foundCategories.Add(category);
