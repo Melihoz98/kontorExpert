@@ -1,4 +1,3 @@
-using kontorExpert.BusinessLogic;
 using kontorExpert.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -11,18 +10,16 @@ namespace kontorExpert.Controllers
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
-        private readonly CategoryLogic _categoryLogic;
 
-        public HomeController(ILogger<HomeController> logger, CategoryLogic categoryLogic)
+        public HomeController(ILogger<HomeController> logger)
         {
             _logger = logger;
-            _categoryLogic = categoryLogic;
+           
         }
 
         public async Task<IActionResult> Index()
         {
-            List<Category> categories = await _categoryLogic.GetAllCategoriesAsync();
-            return View(categories);
+            return View();
         }
 
         public IActionResult Privacy()
